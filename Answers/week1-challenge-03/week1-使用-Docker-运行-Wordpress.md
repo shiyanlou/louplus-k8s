@@ -117,8 +117,8 @@ mkdir -p challenge && cd challenge
 docker build -t syl-wordpress .
 
 # 运行镜像
-docker run -d -p 80:80 --name syl-wordpress syl-wordpress
+docker run -d -p 8080:80 --name syl-wordpress syl-wordpress:latest
 
 # 访问 Wordpress
-curl http://127.0.0.1/
+curl http://localhost:8080
 ```

@@ -4,13 +4,13 @@
 
 ```bash
 # 设置用户的 uid 和 gid 为 1000
-$ docker run --user=1000:1000 --rm alpine id
+$ docker run --user=1000:1000 --rm -it alpine:latest id
 uid=1000 gid=1000
 # 对文件进行备份
 $ sudo cp /bin/ls /bin/ls.bak && ls /bin/ls.bak
 /bin/ls.bak
 # 设置用户的 uid 和 gid 为 1000，查看文件是否还能被删除
-$ docker run --user=1000:1000 --rm -it -v /bin:/host alpine rm -f /host/ls.bak
+$ docker run --user=1000:1000 --rm -it -v /bin:/host alpine:latest rm -f /host/ls.bak
 rm: can't remove '/host/ls.bak': Permission denied
 ```
 

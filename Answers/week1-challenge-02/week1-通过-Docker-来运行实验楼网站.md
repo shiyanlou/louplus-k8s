@@ -37,7 +37,7 @@ FROM registry.cn-hangzhou.aliyuncs.com/louplus-linux/python:3.5
 COPY app.py .
 
 # 安装 pip 依赖包
-RUN pip install flask
+RUN pip3 install flask
 
 # 设置 Flask 应用路径环境变量
 ENV FLASK_APP=app.py
@@ -61,11 +61,13 @@ docker build -t shiyanlou .
 docker network create shiyanlou
 
 # 运行一个容器来提供网站服务，该容器加入到 shiyanlou 网络里
-docker run -d --name shiyanlou --network shiyanlou shiyanlou
+docker run -d --name shiyanlou --network shiyanlou shiyanlou:latest
 
 # 运行一个容器来提供 Nginx 服务，该容器也加入到 shiyanlou 网络里，以便可以访问到网站服务
 docker run -d --name nginx --network shiyanlou -v /home/shiyanlou/challenge/shiyanlou.conf:/etc/nginx/conf.d/shiyanlou.conf -p 8080:80 registry.cn-hangzhou.aliyuncs.com/louplus-linux/nginx:1.9.1
 
-# 执行下面命令之前，请先添加 Hosts “127.0.0.1   shiyanlou.com”
+sudo vim /etc/hosts
+# 添加 Hosts “127.0.0.1   shiyanlou.com”
+
 curl http://shiyanlou.com:8080/
 ```

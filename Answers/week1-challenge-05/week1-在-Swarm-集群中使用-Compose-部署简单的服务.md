@@ -8,7 +8,7 @@ $ docker swarm init --advertise-addr=eth0
 # 安装 docker compose
 $ wget http://labfile.oss-cn-hangzhou.aliyuncs.com/courses/980/software/docker-compose-Linux-x86_64
 $ sudo mv docker-compose-Linux-x86_64 /usr/local/bin/docker-compose
-$ sudo chmod +x /usr/local/bin/docker-composer
+$ sudo chmod +x /usr/local/bin/docker-compose
 $ mkdir challenge && cd challenge
 $ touch docker-compose.yml
 ```
@@ -16,14 +16,15 @@ $ touch docker-compose.yml
 docker-compose.yml 文件内容如下所示：
 
 ```yml
+# docker compose 的版本为 3
 version: "3"
 
+# 由 3 个服务共同组成：db、wordpress、visualizer
 services:
   db:
-    image: mysql:5.7
+    image: registry-vpc.cn-hangzhou.aliyuncs.com/chenshi-kubernetes/mysql:5.7
     volumes:
       - db-data:/var/lib/mysql
-    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: somewordpress
       MYSQL_DATABASE: wordpress
@@ -33,10 +34,9 @@ services:
   wordpress:
     depends_on:
       - db
-    image: wordpress:latest
+    image: registry-vpc.cn-hangzhou.aliyuncs.com/chenshi-kubernetes/wordpress:latest
     ports:
       - "80:80"
-    restart: always
     environment:
       WORDPRESS_DB_HOST: db:3306
       WORDPRESS_DB_USER: wordpress
@@ -47,14 +47,14 @@ services:
       replicas: 3
 
   visualizer:
-    image: dockersamples/visualizer:stable
+    image: registry-vpc.cn-hangzhou.aliyuncs.com/chenshi-kubernetes/visualizer:stable
     ports:
       - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
 volumes:
-  db-data: {}
+  db-data:
 ```
 
 执行部署：
@@ -77,9 +77,9 @@ wordpress           3                   Swarm
 
 在浏览器访问 `localhost:8080`，可以看到在当前节点运行的服务的可视化图形：
 
-!(此处输入图片的描述)[https://doc.shiyanlou.com/courses/1457/600404/17235af8c0bc76110b93b2be1564f37c/wm]
+![此处输入图片的描述](https://doc.shiyanlou.com/courses/1457/600404/17235af8c0bc76110b93b2be1564f37c/wm)
 
-!(此处输入图片的描述)[https://doc.shiyanlou.com/courses/1457/600404/db6ca14da9bcd323a4c048a18f9231b3/wm]
+![此处输入图片的描述](https://doc.shiyanlou.com/courses/1457/600404/db6ca14da9bcd323a4c048a18f9231b3/wm)
 
 由于当前只有一个节点，所以所有服务都运行在这个节点上。
 
