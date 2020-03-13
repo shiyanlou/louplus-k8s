@@ -1,6 +1,6 @@
 # 挑战：使用 Kubectl 完成需求
 
-1. 使用 `create` 命令创建 nginx.yaml 文件中定义的资源对象；
+1.使用 `create` 命令创建 nginx.yaml 文件中定义的资源对象。
 
 ```bash
 $ kubectl create -f nginx/
@@ -21,7 +21,7 @@ kubernetes   ClusterIP   10.96.0.1        <none>        443/TCP        18d
 nginx        NodePort    10.110.188.107   <none>        80:31001/TCP   2m47s
 ```
 
-2. 使用 `edit` 命令将 nginx service 的 nodePort 从 31001 修改为 31002，使得执行命令 `curl http://10.192.0.2:31002/` 可以成功获取到数据；
+2.使用 `edit` 命令将 nginx service 的 nodePort 从 31001 修改为 31002，使得执行命令 `curl http://10.192.0.2:31002/` 可以成功获取到数据。
 
 ```bash
 $ kubectl edit service nginx
@@ -40,14 +40,14 @@ $ curl http://10.192.0.2:31001/
 curl: (7) Failed to connect to 10.192.0.2 port 31001: Connection refused
 ```
 
-3. 使用 `patch` 命令将 nginx 的镜像更换为 `nginx:1.13-alpine`；
+3.使用 `patch` 命令将 nginx 的镜像更换为 `registry-vpc.cn-hangzhou.aliyuncs.com/chenshi-kubernetes/nginx:1.13-alpine`。
 
 ```bash
 $ kubectl get pod
 NAME                     READY   STATUS    RESTARTS   AGE
 nginx-68986b6d96-gdckn   1/1     Running   0          25m
 
-$ kubectl patch pod nginx-68986b6d96-gdckn -p '{"spec":{"containers":[{"name":"nginx","image":"nginx:1.13-alpine"}]}}'
+$ kubectl patch pod nginx-68986b6d96-gdckn -p '{"spec":{"containers":[{"name":"nginx","image":"registry-vpc.cn-hangzhou.aliyuncs.com/chenshi-kubernetes/nginx:1.13-alpine"}]}}'
 pod/nginx-68986b6d96-gdckn patched
 
 # 确认更换以后 pod 中的 nginx 镜像版本
@@ -57,7 +57,7 @@ nginx version: nginx/1.13.12
 / #
 ```
 
-4. 修改 nginx.yaml 文件，将 nginx service 的 nodePort 从 31002 修改为 31003，使用 `apply` 命令对资源对象进行更新；
+4.修改 nginx.yaml 文件，将 nginx service 的 nodePort 从 31002 修改为 31003，使用 `apply` 命令对资源对象进行更新。
 
 ```bash
 $ kubectl get svc
@@ -80,7 +80,7 @@ kubernetes   ClusterIP   10.96.0.1        <none>        443/TCP        18d
 nginx        NodePort    10.110.188.107   <none>        80:31003/TCP   39m
 ```
 
-5. 使用 `scale` 命令将 nginx 资源对象进行横向扩展，从 1 个副本拓展为 3 个副本；
+5.使用 `scale` 命令将 nginx 资源对象进行横向扩展，从 1 个副本扩展为 3 个副本。
 
 ```bash
 $ kubectl get pods -o wide
@@ -101,7 +101,7 @@ nginx-68986b6d96-gdckn   1/1     Running   1          46m   10.244.2.4   kube-no
 nginx-68986b6d96-r2ffx   1/1     Running   0          24s   10.244.3.3   kube-node-2   <none>           <none>
 ```
 
-6. 对节点 kude-node-1 执行维护操作之前，使用 `drain` 命令安全驱逐 kude-node-1 节点上面所有的 pod；
+6.对节点 kude-node-1 执行维护操作之前，使用 `drain` 命令安全驱逐 kude-node-1 节点上面所有的 pod。
 
 ```bash
 # 可以发现在 kube-node-1 节点上还运行着两个 nginx pod

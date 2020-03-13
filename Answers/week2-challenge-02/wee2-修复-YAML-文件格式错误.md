@@ -4,11 +4,14 @@
 
 ```yaml
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: rss-site
 spec:
+  selector:
+    matchLabels:
+      app: web
   replicas: 2
   template:
     metadata:
@@ -16,12 +19,12 @@ spec:
         app: web
     spec:
       containers:
-        – name: front-end
-          image: nginx
+        - name: front-end
+          image: registry-vpc.cn-hangzhou.aliyuncs.com/chenshi-kubernetes/nginx:1.9.1
           ports:
-            – containerPort: 80
-        – name: rss-reader
-          image: nickchase/rss-php-nginx:v1
+            - containerPort: 80
+        - name: rss-reader
+          image: registry-vpc.cn-hangzhou.aliyuncs.com/chenshi-kubernetes/rss-php-nginx:v1
           ports:
-            – containerPort: 88
+            - containerPort: 88
 ```
