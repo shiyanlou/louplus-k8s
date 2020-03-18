@@ -1,5 +1,12 @@
 # 挑战：使用 ConfigMap 配置 Pod
 
+由于实验环境为 dind，直接运行 MySQL Pod 会报错，暂时可以使用如下命令解决：
+
+```bash
+sudo ln -s /etc/apparmor.d/usr.sbin.mysqld /etc/apparmor.d/disable/
+sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.mysqld
+```
+
 从文件创建名为 mysql-config 的 ConfigMap：
 
 ```bash
@@ -31,7 +38,7 @@ spec:
         app: mysql
     spec:
       containers:
-        - image: mysql:5.7
+        - image: registry-vpc.cn-hangzhou.aliyuncs.com/chenshi-kubernetes/mysql:5.7
           name: mysql
           ports:
             - containerPort: 3306
@@ -110,7 +117,7 @@ $ kubectl describe pod mysql-6574f97df5-wc2vg
 ......
 ```
 
-另外在这里介绍一下卷挂载的方式可以使用 ConfigMap 热更新，比如我们修改 mysql-config ConfigMap，在 [mysqld] 字段下添加一项配置 `server-id = 1`，等待一会儿进入容器查看就可以发现文件的配置也响应进行了更改（热更新需要的时间相对要长一点，可能在一到两分钟左右）：
+另外在这里介绍一下卷挂载的方式可以使用 ConfigMap 热更新，比如我们修改 mysql-config ConfigMap，在 [mysqld] 字段下添加一项配置 `server-id = 1`，等待一会儿进入容器查看就可以发现文件的配置也相应进行了更改（热更新需要的时间相对要长一点，可能在一到两分钟左右）：
 
 ```bash
 $ kubectl edit configmap mysql-config

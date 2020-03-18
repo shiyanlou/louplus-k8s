@@ -10,7 +10,7 @@ metadata:
 spec:
   containers:
     - name: nginx-container
-      image: nginx
+      image: registry.cn-hangzhou.aliyuncs.com/louplus-linux/nginx:1.9.1
       volumeMounts:
         - name: html
           mountPath: /usr/share/nginx/html

@@ -26,6 +26,13 @@ reboot
 
 3. 参考第二周课程中的《阿里云 ECS 安装 Kubeadm》实验进行配置，这里只列出比较重要的步骤
 
+需要注意的是如果 kubeadm、kubelet、kubectl 工具的版本太新，可能对应的资源在阿里云源中没有，所以可以安装指定版本号的工具：
+
+```bash
+apt-get remove -y kubelet kubeadm kubectl
+apt-get install -y  kubeadm=1.16.0-00 kubectl=1.16.0-00 kubelet=1.16.0-00
+```
+
 使用 kubeadm 初始化集群（在 3 个节点都执行如下命令）：
 
 ```bash
@@ -43,25 +50,17 @@ chown $(id -u):$(id -g) $HOME/.kube/config
 安装网络插件 flannel（在 3 个节点都执行如下命令）：
 
 ```bash
-docker pull quay-mirror.qiniu.com/coreos/flannel:v0.11.0-amd64
-docker tag quay-mirror.qiniu.com/coreos/flannel:v0.11.0-amd64 quay.io/coreos/flannel:v0.11.0-amd64
-```
-
-部署 flannel（在 3 个节点都执行如下命令）：
-
-```bash
+docker pull quay.io/coreos/flannel:v0.12.0-amd64
 kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 ```
 
-查看节点是否部署成功，并移除节点的 taint：
+查看节点是否部署成功：
 
 ```bash
 # 其余两个节点的命令类似
 root@work-manage:~# kubectl get nodes
 NAME        STATUS   ROLES    AGE     VERSION
 work-manage   Ready    master   5m10s   v1.17.0
-root@work-manage:~# kubectl taint nodes work-manage node-role.kubernetes.io/master-
-node/work-manage untainted
 ```
 
 4. 在 work-manage 集群中执行如下命令

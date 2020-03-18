@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: tomcat
-          image: tomcat
+          image: registry-vpc.cn-hangzhou.aliyuncs.com/chenshi-kubernetes/tomcat-app:v1
           ports:
             - containerPort: 8080
 ```

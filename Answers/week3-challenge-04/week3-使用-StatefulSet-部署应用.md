@@ -110,7 +110,7 @@ spec:
     spec:
       containers:
         - name: mongo
-          image: mongo
+          image: registry-vpc.cn-hangzhou.aliyuncs.com/chenshi-kubernetes/mongo:latest
           command:
             - mongod
           ports:

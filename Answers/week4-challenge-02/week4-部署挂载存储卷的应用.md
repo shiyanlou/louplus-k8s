@@ -1,5 +1,7 @@
 # 挑战：部署挂载存储卷的应用
 
+使用 Kubeadm 在阿里云 ECS 上创建一个单节点 Kubernetes 集群的步骤这里就省略了。
+
 这里用户为 `root`，主目录为 `/root`。
 
 首先安装 NFS 服务端：
@@ -32,7 +34,7 @@ systemctl restart nfs-kernel-server
 查看共享文件情况：
 
 ```bash
-$ showmount -e
+$ showmount -e localhost
 Export list for iZbp1ikd8ja49b9u9hm8auZ:
 /root/nfs *
 ```
@@ -117,7 +119,7 @@ metadata:
 spec:
   containers:
     - name: mycontainer # 容器名称为 mycontainer
-      image: nginx # 镜像为 nginx
+      image: registry.cn-hangzhou.aliyuncs.com/louplus-linux/nginx:1.9.1 # 镜像为 nginx
       ports:
         - containerPort: 80 # 设置端口号为 80
           name: "http-server"
@@ -149,7 +151,7 @@ root@mypod:/# ls /var/data
 abc
 root@mypod:/# exit
 exit
-
+# 查看磁盘的一个使用情况
 $ df -h|grep localhost
 localhost:/root/nfs   40G  3.5G   34G  10% /var/lib/kubelet/pods/d20058ce-6e22-4b82-892a-752617c275b3/volumes/kubernetes.io~nfs/mypv
 ```

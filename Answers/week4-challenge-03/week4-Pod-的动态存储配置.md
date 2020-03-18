@@ -1,5 +1,7 @@
 # 挑战：Pod 的动态存储配置
 
+使用 Kubeadm 在阿里云 ECS 上创建一个单节点 Kubernetes 集群的步骤这里就省略了。
+
 #### 安装配置 NFS 服务端
 
 首先安装 NFS 服务端：
@@ -32,7 +34,7 @@ systemctl restart nfs-kernel-server
 查看共享文件情况：
 
 ```bash
-$ showmount -e
+$ showmount -e localhost
 Export list for iZbp15hy2fqh7xdgl5ezw9Z:
 /root/nfs *
 ```
@@ -41,54 +43,7 @@ Export list for iZbp15hy2fqh7xdgl5ezw9Z:
 
 由于 NFS 不支持自动创建 PV，可以利用社区提供的插件 nfs-client-provisioner Pod 来完成 PV 的自动创建，也就是说这个插件实现了 StorageClass 自动创建 PV 的需求。当 NFS 创建完成后，再被其它的 Pod 进行引用。
 
-首先创建 nfs-client-provisioner 插件（其实是一个 Pod），在 `/root` 目录下新建 `nfs-deployment.yaml` 文件，并向其中写入如下内容：
-
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nfs-client-provisioner
-spec:
-  selector:
-    matchLabels:
-      app: nfs-client-provisioner
-  replicas: 1
-  strategy:
-    type: Recreate
-  template:
-    metadata:
-      labels:
-        app: nfs-client-provisioner
-    spec:
-      serviceAccountName: nfs-client-provisioner
-      containers:
-        - name: nfs-client-provisioner
-          image: quay.io/external_storage/nfs-client-provisioner:latest
-          volumeMounts:
-            - name: nfs-client-root
-              mountPath: /persistentvolumes
-          env:
-            - name: PROVISIONER_NAME
-              value: fuseim.pri/ifs
-            - name: NFS_SERVER
-              value: localhost # nfs 服务器的地址
-            - name: NFS_PATH
-              value: /root/nfs # 共享文件的路径，这里可以根据实际情况填写你们设置的共享文件路径
-      volumes:
-        - name: nfs-client-root
-          nfs:
-            server: localhost # nfs 服务器的地址
-            path: /root/nfs # 共享文件的路径，这里可以根据实际情况填写你们设置的共享文件路径
-```
-
-执行创建：
-
-```bash
-$ kubectl create -f nfs-deployment.yaml
-deployment.apps/nfs-client-provisioner created
-```
-
-由于这个 nfs-client-provisioner Pod 需要访问 apiServer，所以需要定义 RBAC 授权策略。在 `/root` 目录下新建 `rbac.yaml` 文件，并向其中写入如下内容：
+由于 nfs-client-provisioner 插件需要访问 apiServer，使用 RBAC 授权策略。在 `/root` 目录下新建 `rbac.yaml` 文件，并向其中写入如下内容：
 
 ```yaml
 apiVersion: v1
@@ -163,6 +118,53 @@ role.rbac.authorization.k8s.io/leader-locking-nfs-client-provisioner created
 rolebinding.rbac.authorization.k8s.io/leader-locking-nfs-client-provisioner created
 ```
 
+然后创建 nfs-client-provisioner 插件（其实是一个 Pod），在 `/root` 目录下新建 `nfs-deployment.yaml` 文件，并向其中写入如下内容：
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nfs-client-provisioner
+spec:
+  selector:
+    matchLabels:
+      app: nfs-client-provisioner
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: nfs-client-provisioner
+    spec:
+      serviceAccountName: nfs-client-provisioner
+      containers:
+        - name: nfs-client-provisioner
+          image: quay.io/external_storage/nfs-client-provisioner:latest
+          volumeMounts:
+            - name: nfs-client-root
+              mountPath: /persistentvolumes
+          env:
+            - name: PROVISIONER_NAME
+              value: fuseim.pri/ifs
+            - name: NFS_SERVER
+              value: localhost # nfs 服务器的地址
+            - name: NFS_PATH
+              value: /root/nfs # 共享文件的路径，这里可以根据实际情况填写你们设置的共享文件路径
+      volumes:
+        - name: nfs-client-root
+          nfs:
+            server: localhost # nfs 服务器的地址
+            path: /root/nfs # 共享文件的路径，这里可以根据实际情况填写你们设置的共享文件路径
+```
+
+执行创建：
+
+```bash
+$ kubectl create -f nfs-deployment.yaml
+deployment.apps/nfs-client-provisioner created
+```
+
 最后创建 StorageClass，在 `/root` 目录下新建 `class.yaml` 文件，并向其中写入如下内容：
 
 ```yaml
@@ -170,7 +172,7 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: default # 设置 StorageClass 的名称为 default
-provisioner: fuseim.pri/ifs
+provisioner: fuseim.pri/ifs  # 这里填写的是 provisioner 的名称，需要与上面 deployment 环境变量 PROVISIONER_NAME 的值一致
 ```
 
 执行创建：
@@ -225,7 +227,7 @@ NAME                                       CAPACITY   ACCESS MODES   RECLAIM POL
 pvc-0809a9d6-fbb3-4652-b675-6910457a179c   1Mi        RWX            Delete           Bound    default/test-claim   default                 4m10s
 ```
 
-启动一个测试 Pod，用于在名为 test-claim 的 PVC 中新创建一个 SUCCESS 文件，在 `/root` 目录下新建 `test-pod.yaml` 文件，并向其中写入如下内容：
+启动一个测试 Pod，用于在名为 test-claim 的 PVC 中新创建一个 SUCCESS 文件。在 `/root` 目录下新建 `test-pod.yaml` 文件，并向其中写入如下内容：
 
 ```yaml
 apiVersion: v1

@@ -1,5 +1,37 @@
 # 挑战：配置 Ingress 访问 Dashboard
 
+部署 nginx-ingress-controller 插件：
+
+需要下载 `nginx-ingress-controller.yaml` 文件和 `ingress-service-nodeport.yaml` 文件，这里已经提供了完整的 YAML 文件，大家执行下载即可：
+
+```bash
+wget https://labfile.oss.aliyuncs.com/courses/1457/nginx-ingress-controller.yaml
+wget https://labfile.oss.aliyuncs.com/courses/1457/ingress-service-nodeport.yaml
+```
+
+先创建 nginx-ingress-controller Pod：
+
+```bash
+$ kubectl create -f nginx-ingress-controller.yaml
+namespace/ingress-nginx created
+configmap/nginx-configuration created
+configmap/tcp-services created
+configmap/udp-services created
+serviceaccount/nginx-ingress-serviceaccount created
+clusterrole.rbac.authorization.k8s.io/nginx-ingress-clusterrole created
+role.rbac.authorization.k8s.io/nginx-ingress-role created
+rolebinding.rbac.authorization.k8s.io/nginx-ingress-role-nisa-binding created
+clusterrolebinding.rbac.authorization.k8s.io/nginx-ingress-clusterrole-nisa-binding created
+deployment.apps/nginx-ingress-controller created
+```
+
+然后为 nginx-ingress-controller Pod 创建 NodePort 类型的 Service：
+
+```bash
+$ kubectl create -f ingress-service-nodeport.yaml
+service/ingress-nginx created
+```
+
 查看 kubernetes-dashboard 的相关信息：
 
 ```bash
@@ -50,8 +82,11 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: ingress-kube-dashboard
+  namespace: kube-system
   annotations:
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS" # Ingress Controller 将客户端的请求转发给 dashboard 服务时使用 HTTPS 协议，如果这里不指定默认为 HTTP 协议，这样的话会报错
+    nginx.ingress.kubernetes.io/secure-backends: "true"
+    nginx.ingress.kubernetes.io/ssl-passthrough: "true
 spec:
   tls:
     - hosts:
@@ -70,7 +105,7 @@ spec:
 执行创建：
 
 ```bash
-$ kubectl create -f kube-dashboard-ingress.yaml -n kube-system
+$ kubectl create -f kube-dashboard-ingress.yaml
 ingress.extensions/ingress-kube-dashboard created
 $ kubectl get ingress -n kube-system
 NAME                     HOSTS                ADDRESS         PORTS     AGE

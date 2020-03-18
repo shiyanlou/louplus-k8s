@@ -1,5 +1,12 @@
 # 挑战：使用 Deployment 升级 Pod
 
+由于实验环境为 dind，直接运行 MySQL Pod 会报错，暂时可以使用如下命令解决：
+
+```bash
+sudo ln -s /etc/apparmor.d/usr.sbin.mysqld /etc/apparmor.d/disable/
+sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.mysqld
+```
+
 在 `/home/shiyanlou` 目录下新建 `mysql-deployment.yaml` 文件，并写入如下内容：
 
 ```yaml
@@ -19,7 +26,7 @@ spec:
     spec:
       containers:
         - name: database
-          image: mysql:5.7
+          image: registry-vpc.cn-hangzhou.aliyuncs.com/chenshi-kubernetes/mysql:5.7
           ports:
             - containerPort: 3306
           env:
@@ -55,6 +62,6 @@ mysql-deployment-5897447f6c-vh46l   1/1     Running   0          20s
 执行升级，将 mysql:5.7 的镜像升级为 mysql:8.0 的镜像：
 
 ```bash
-$ kubectl set image deployment/mysql-deployment database=mysql:8.0
+$ kubectl set image deployment/mysql-deployment database=registry-vpc.cn-hangzhou.aliyuncs.com/chenshi-kubernetes/mysql:8.0
 deployment.extensions/mysql-deployment image updated
 ```
