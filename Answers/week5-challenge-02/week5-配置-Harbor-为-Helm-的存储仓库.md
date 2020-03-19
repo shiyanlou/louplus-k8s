@@ -66,7 +66,7 @@ stable      https://kubernetes-charts.storage.googleapis.com
 goharbor    https://helm.goharbor.io
 test_repo   http://10.192.0.2:30002/chartrepo/chart_repo
 # 安装 helm-push 插件
-# 这里可能遇到 GitHub 访问延时严重的问题，可以逐个查找哪个 DNS 可以访问，然后配置到 /etc/hosts 中
+# 这里可能遇到 GitHub 访问超时严重的问题，可以逐个查找哪个 DNS 可以访问，然后配置到 /etc/hosts 中
 $ helm plugin install https://github.com/chartmuseum/helm-push
 Downloading and installing helm-push v0.8.1 ...
 https://github.com/chartmuseum/helm-push/releases/download/v0.8.1/helm-push_0.8.1_linux_amd64.tar.gz

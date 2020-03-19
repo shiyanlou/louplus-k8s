@@ -68,6 +68,7 @@ subjects:
 - kind: ServiceAccount
   name: shiyanlou-api-service-account
   namespace: default
+
 # 执行创建
 $ kubectl create -f clusterRole.yaml
 clusterrole.rbac.authorization.k8s.io/api-access created

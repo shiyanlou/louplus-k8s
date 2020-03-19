@@ -9,7 +9,7 @@ $ sudo cp linux-amd64/helm /usr/local/bin/helm
 # 安装成功，查看 Helm 的版本
 $ helm version
 version.BuildInfo{Version:"v3.0.2", GitCommit:"19e47ee3283ae98139d98460de796c1be1e3975f", GitTreeState:"clean", GoVersion:"go1.13.5"}
-# 添加一个 Chart 仓库，由于国内无法访问 Helm 默认的 Chart 仓库，这里改为阿里云 Chart 镜像仓库
+# 添加一个 Chart 仓库，这里设置阿里云 Chart 镜像仓库为标准仓库
 $ helm repo add stable https://kubernetes.oss-cn-hangzhou.aliyuncs.com/charts
 "stable" has been added to your repositories
 ```
@@ -35,7 +35,7 @@ vim tomcat/templates/deployment.yaml
             - name: http
               containerPort: 8080 # 设置容器端口为 8080
               protocol: TCP
-          #livenessProbe:   # 删除存活探针和就绪探针
+          #livenessProbe:   # 删除存活探针和就绪探针的检测
           #  httpGet:
           #    path: /
           #    port: http

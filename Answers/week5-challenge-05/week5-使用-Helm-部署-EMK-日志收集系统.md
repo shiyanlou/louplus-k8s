@@ -13,15 +13,7 @@ kube-node-1    47.97.81.80     172.16.98.181
 kube-node-2    47.97.5.13      172.16.98.182
 ```
 
-命名后的节点添加 host 名称，向 `/etc/hosts` 文件分别添加节点名和对应的内网 IP 地址：
-
-```bash
-172.16.98.180 kube-master
-172.16.98.181 kube-node-1
-172.16.98.182 kube-node-2
-```
-
-最后搭建成功的节点如下所示：
+搭建成功的节点如下所示：
 
 ```bash
 $ kubectl get nodes
@@ -38,8 +30,8 @@ kube-node-2   Ready    <none>   3m10s   v1.17.0
 $ wget https://labfile.oss.aliyuncs.com/courses/1502/helm-v2.16.1-linux-amd64.tar.gz
 $ tar -zxvf helm-v2.16.1-darwin-amd64.tar.gz
 $ cd linux-amd64
-$ sudo cp helm /usr/local/bin
-$ sudo cp tiller /usr/local/bin
+$ cp helm /usr/local/bin
+$ cp tiller /usr/local/bin
 # 下载 tiller 的配置文件，主要是创建 ServiceAccount 以及创建集群角色绑定
 $ wget https://labfile.oss.aliyuncs.com/courses/1502/rbac-config.yaml
 $ kubectl create -f rbac-config.yaml
@@ -93,7 +85,7 @@ elasticsearch-7.5.1.tgz
 # 解压缩
 $ tar -zxvf elasticsearch-7.5.1.tgz
 $ vim elasticsearch/values.yaml
-# 将 replicas 的值修改为 2，将 image 的值修改为 registry-vpc.cn-hangzhou.aliyuncs.com/chenshi-kubernetes/elasticsearch，在 volumeClaimTemplate 中添加一项 storageClassName: local-storage。
+# 将 replicas 的值修改为 2，将 image 的值修改为 registry-vpc.cn-hangzhou.aliyuncs.com/chenshi-kubernetes/elasticsearch，修改 imageTag 为 7.5.1，在 volumeClaimTemplate 中添加一项 storageClassName: local-storage。
 # 修改完成，进行打包
 $ helm package elasticsearch
 Successfully packaged chart and saved it to: /home/shiyanlou/.helm/cache/archive/elasticsearch-7.5.1.tgz
@@ -178,7 +170,7 @@ $ cd ~/.helm/cache/archive
 $ helm fetch elastic/kibana
 $ tar -zxvf kibana-7.5.1.tgz
 $ vim kibana/values.yaml
-# 修改 image 为 registry-vpc.cn-hangzhou.aliyuncs.com/chenshi-kubernetes/kibana
+# 修改 image 为 registry-vpc.cn-hangzhou.aliyuncs.com/chenshi-kubernetes/kibana，修改 imageTag 为 7.5.1
 $ helm package kibana
 Successfully packaged chart and saved it to: /Users/yuanchunrong/.helm/cache/archive/kibana-7.5.1.tgz
 # 使用修改后的文件进行安装，并命名为 kibana
@@ -215,7 +207,7 @@ $ cd ~/.helm/cache/archive
 $ helm fetch elastic/metricbeat
 $ tar -zxvf metricbeat-7.5.1.tgz
 $ vim metricbeat/values.yaml
-# 修改 image 为 registry-vpc.cn-hangzhou.aliyuncs.com/chenshi-kubernetes/metricbeat
+# 修改 image 为 registry-vpc.cn-hangzhou.aliyuncs.com/chenshi-kubernetes/metricbeat，修改 imageTag 为 7.5.1
 $ helm package metricbeat
 Successfully packaged chart and saved it to: /root/.helm/cache/archive/metricbeat-7.5.1.tgz
 # 使用修改后的文件进行安装，并命名为 metricbeat
