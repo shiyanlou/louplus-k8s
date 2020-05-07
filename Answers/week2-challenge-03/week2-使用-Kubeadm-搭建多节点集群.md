@@ -89,11 +89,20 @@ This node has joined the cluster:
 Run 'kubectl get nodes' on the control-plane to see this node join the cluster.
 ```
 
-安装 flannel 网络插件：
+安装 flannel 网络插件。
+
+提前在 3 个节点都拉取镜像，并重新打标签：
 
 ```bash
-docker pull quay.io/coreos/flannel:v0.12.0-amd64
-kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+$ docker pull registry-vpc.cn-hangzhou.aliyuncs.com/chenshi-kubernetes/flannel:v0.12.0-amd64
+$ docker tag registry-vpc.cn-hangzhou.aliyuncs.com/chenshi-kubernetes/flannel:v0.12.0-amd64 quay.io/coreos/flannel:v0.12.0-amd64
+```
+
+在 kube-master 节点下载 yaml 文件，并执行创建：
+
+```bash
+$ wget https://labfile.oss.aliyuncs.com/courses/1494/kube-flannel.yml
+$ kubectl create -f kube-flannel.yml
 ```
 
 检查 Node 是否成功加入集群。在 kube-master 节点执行如下命令：
